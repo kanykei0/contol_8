@@ -43,9 +43,9 @@ const Home = () => {
 
   const page = quotes && (
     <div className="row">
-      <div className="col-3">
+      <div className="col-3 p-0 rounded align-self-start">
         <ul className="list-unstyled">
-          <li>
+          <li className="shadow py-4 ps-3">
             <Link to="/" className="nav-link">
               All
             </Link>
@@ -55,7 +55,7 @@ const Home = () => {
               (cat) => cat.id === category
             );
             return (
-              <li key={category}>
+              <li key={category} className="shadow py-4 ps-3">
                 <Link to={`/quotes/${category}`} className="nav-link">
                   {categoryInfo?.title}
                 </Link>
