@@ -2,14 +2,14 @@ import { useState } from "react";
 import { Spinner } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
-import { FullQuote } from "../../type";
+import { QuoteMutation } from "../../type";
 import { useNavigate } from "react-router-dom";
 import axiosApi from "../../axiosApi";
 
 const QuoteForm = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [field, setField] = useState<FullQuote>({
+  const [field, setField] = useState<QuoteMutation>({
     category: "",
     author: "",
     text: "",
@@ -29,9 +29,14 @@ const QuoteForm = () => {
   const onFormSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setLoading(true);
+    const date = new Date().getTime().toString();
+    const newQuote = {
+      id: date,
+      ...field,
+    };
 
     try {
-      await axiosApi.post("quotes.json", field);
+      await axiosApi.post("quotes.json", newQuote);
       navigate("/");
     } finally {
       setLoading(false);

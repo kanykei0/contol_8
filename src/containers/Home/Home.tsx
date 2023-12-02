@@ -1,31 +1,29 @@
 import { useEffect, useState } from "react";
-import { FullQuote } from "../../type";
+import { QuotesListType } from "../../type";
 import axiosApi from "../../axiosApi";
 import { Spinner } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+import Quotes from "../../components/Quotes/Quoutes";
+import quoteCategories from "../../components/QuoteCategories/QuoteCategories";
+import QuotesList from "../QuotesList/QuotesList";
 
 const Home = () => {
   const [loading, setLoading] = useState(false);
-  const [quotes, setQuotes] = useState<FullQuote[]>([]);
-  const quoteCategories = [
-    { title: "Star Wars", id: "star-wars" },
-    { title: "Famous People", id: "famous-people" },
-    { title: "Saying", id: "saying" },
-    { title: "Humour", id: "humour" },
-    { title: "Motivational", id: "motivational" },
-  ];
+  const [quotes, setQuotes] = useState<QuotesListType>({});
+
+  const params = useParams();
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const response = await axiosApi.get("quotes.json");
+      setQuotes(response.data);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const response = await axiosApi.get("quotes.json");
-        setQuotes(response.data);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchData();
   }, []);
 
@@ -38,10 +36,20 @@ const Home = () => {
       return acc;
     }, [] as string[]);
 
+  const onDelete = async (quoteId: string) => {
+    await axiosApi.delete("quotes/" + quoteId + ".json");
+    await fetchData();
+  };
+
   const page = quotes && (
     <div className="row">
       <div className="col-3">
         <ul className="list-unstyled">
+          <li>
+            <Link to="/" className="nav-link">
+              All
+            </Link>
+          </li>
           {uniqueCategories.map((category) => {
             const categoryInfo = quoteCategories.find(
               (cat) => cat.id === category
@@ -56,7 +64,13 @@ const Home = () => {
           })}
         </ul>
       </div>
-      <div className="col"></div>
+      <div className="col">
+        {params ? (
+          <QuotesList />
+        ) : (
+          <Quotes quotes={quotes} onDelete={onDelete} />
+        )}
+      </div>
     </div>
   );
 
